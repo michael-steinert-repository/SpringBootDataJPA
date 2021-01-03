@@ -1,9 +1,13 @@
 package com.example.SpringBootDataJPA;
 
+import com.github.javafaker.Faker;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.util.List;
 
@@ -17,11 +21,11 @@ public class SpringBootDataJPA {
 	@Bean
 	CommandLineRunner commandLineRunner(StudentRepository studentRepository) {
 		return args -> {
+			System.out.println("Adding Students: ");
+			generateRandomStudents(studentRepository);
 			Student student1 = new Student("Michael", "Steinert", "michael.steinert.94@gmail.com", 26);
 			Student student2 = new Student("Marie", "Schmidt", "marie.schmidt.95@gmail.com", 25);
 			Student student3 = new Student("Marie", "Schmidt", "marie.schmidt.98@gmail.com", 22);
-
-			System.out.println("Adding Students: ");
 			studentRepository.saveAll(List.of(student1, student2, student3));
 
 			System.out.println("Number of Students: ");
@@ -63,6 +67,29 @@ public class SpringBootDataJPA {
 
 			System.out.println("Delete Student Email marie.schmidt.98@gmail.com: ");
 			System.out.println(studentRepository.deleteStudentByEmail("marie.schmidt.98@gmail.com"));
+
+			System.out.println("Find all Students and sort by First Name");
+			List<Student> studentSortedList = studentRepository.findAll(Sort.by("firstName").ascending().and(Sort.by("age").descending()));
+			studentSortedList.forEach(student -> System.out.println(student.getFirstName() + " " + student.getAge()));
+
+			System.out.println("Find all Students by Pagination of Size 5");
+			PageRequest pageRequest = PageRequest.of(0, 5, Sort.by("firstName").ascending());
+			Page<Student> page = studentRepository.findAll(pageRequest);
+			System.out.println(page);
 		};
+	}
+
+	private void generateRandomStudents(StudentRepository studentRepository) {
+		Faker faker = new Faker();
+		for (int i = 0; i <= 42; i++) {
+			String firstName = faker.name().firstName();
+			String lastName = faker.name().lastName();
+			String email = String.format("%s.%s@mail.com", firstName, lastName);
+			Integer age = faker.number().numberBetween(1, 99);
+
+			Student student = new Student(firstName, lastName, email, age);
+
+			studentRepository.save(student);
+		}
 	}
 }
