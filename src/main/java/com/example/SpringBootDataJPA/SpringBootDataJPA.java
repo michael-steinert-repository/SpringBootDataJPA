@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @SpringBootApplication
@@ -34,15 +35,38 @@ public class SpringBootDataJPA {
 			String email = String.format("%s.%s@mail.com", firstName, lastName);
 			Student student = new Student(firstName, lastName, email, faker.number().numberBetween(17, 55));
 
-			StudentIdCard studentIdCard = new StudentIdCard("123456789", student);
+			StudentIdCard studentIdCard = new StudentIdCard("123456789",student);
 
-			studentIdCardRepository.save(studentIdCard);
+			//studentIdCardRepository.save(studentIdCard);
 
-			studentRepository.findById(1L).ifPresent(System.out::println);
+			//studentRepository.findById(1L).ifPresent(System.out::println);
 
-			studentIdCardRepository.findById(1L).ifPresent(System.out::println);
+			//studentIdCardRepository.findById(1L).ifPresent(System.out::println);
 
-			studentRepository.deleteById(1L);
+			//studentRepository.deleteById(1L);
+
+
+			student.addBook(new Book("Clean Code", LocalDateTime.now().minusDays(4)));
+
+
+			student.addBook(new Book("Think and Grow Rich", LocalDateTime.now()));
+
+
+			student.addBook(new Book("Spring Data JPA", LocalDateTime.now().minusYears(1)));
+
+			student.setStudentIdCard(studentIdCard);
+
+			studentRepository.save(student);
+
+			studentRepository.findById(1L)
+					.ifPresent(s -> {
+						System.out.println("Fetch BookList lazy");
+						List<Book> books = student.getBookList();
+						books.forEach(book -> {
+							System.out.println(
+									s.getFirstName() + " borrowed " + book.getBookName());
+						});
+					});
 		};
 	}
 

@@ -35,7 +35,7 @@ public class StudentIdCard {
     private String cardNumber;
 
     @OneToOne(
-            cascade = CascadeType.ALL,
+            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
             fetch = FetchType.EAGER,
             orphanRemoval = false
     )
