@@ -56,6 +56,19 @@ public class SpringBootDataJPA {
 
 			student.setStudentIdCard(studentIdCard);
 
+			/*
+			//Automatically generated Table Enrolment
+			student.addCourse(new Course("Computer Science", "Technology"));
+
+			student.addCourse(new Course("Bicycle", "Sport"));
+			*/
+
+			student.addEnrolment(new Enrolment(
+					new EnrolmentId(1L, 1L), student, new Course("Computer Science", "Technology"), LocalDateTime.now()));
+
+			student.addEnrolment(new Enrolment(
+					new EnrolmentId(1L, 2L), student, new Course("Bicycle", "Sport"), LocalDateTime.now().minusDays(14)));
+
 			studentRepository.save(student);
 
 			studentRepository.findById(1L)
